@@ -129,7 +129,7 @@ void usage(char *argv0) {
  * @return falses - sum of FN + FP for all k
  * 
  */
-int quality2(int    *golden, int    *approx, int npoints){
+int quality3(int    *golden, int    *approx, int npoints){
     int fn_fp = 0;
     int tp = 0;
     int t=0;
@@ -332,10 +332,8 @@ int main(int argc, char **argv) {
             
             if (i > 0){
                 fprintf(fileResults,"\n\n………………………………………………………………………………………………………………………………………………………………………………………………………\n");
-                fprintf(fileResults,"\t\t\t\t\t\tFN + FP: %d\n", quality2(memberships[0], memberships[i], numObjects));
+                fprintf(fileResults,"\t\t\t\t\t\tFN + FP: %d\n", quality3(memberships[0], memberships[i], numObjects));
                 fprintf(fileResults,"………………………………………………………………………………………………………………………………………………………………………………………………………\n");
-                
-                //Here Rozky
             }
             
             /*
