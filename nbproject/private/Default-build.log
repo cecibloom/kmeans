@@ -1,0 +1,12 @@
+gcc -g -fopenmp -O2  cluster.c -c
+gcc -g -fopenmp -O2  getopt.c -c
+gcc -g -fopenmp -O2  kmeans.c -c
+kmeans.c: In function 'main':
+kmeans.c:152:9: warning: implicit declaration of function 'read' [-Wimplicit-function-declaration]
+         read(infile, &numObjects,    sizeof(int));
+         ^
+kmeans.c:165:9: warning: implicit declaration of function 'close' [-Wimplicit-function-declaration]
+         close(infile);
+         ^
+gcc -g -fopenmp -O2  kmeans_clustering.c -c
+gcc -g -fopenmp -O2  cluster.o getopt.o kmeans.o kmeans_clustering.o  -o kmeans
