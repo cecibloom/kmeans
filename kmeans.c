@@ -119,8 +119,8 @@ void usage(char *argv0) {
  * FN = len(G(k)) - len(A'(k))  
  * FP = len(G(k)) - len(A'(k))  
  * 
- * So every point that it's being assigned a wrong cluster has a penalty of 2: the first for
- * being a false negative, with respect to its true cluster, and the other for being a false
+ * So every point that it's being assigned a wrong eer has a penalty of 2: the first for
+ * being a false negative, with respect to its true cluster, and the other for being a r
  * positive, with respect to the cluster to whom has been mistakenly assigned.
  * 
  * 
@@ -129,6 +129,22 @@ void usage(char *argv0) {
  * @return falses - sum of FN + FP for all k
  * 
  */
+float comparison(float *centroid_golden[],float *centroid_approx[],int  numdims){
+    int i;
+    float ave;
+    float **cluster_centres=NULL;
+    float total_distance;
+    int num_centroid;
+    
+    for (i = 0; i<numdims; i++){
+        total_distance+= euclid_dist_2(centroid_golden[i],centroid_approx[i],numdims);
+        ave=total_distance/num_centroid;
+        printf("average=%f", ave);
+        return ave;
+    }
+} 
+
+
 int quality3(int    *golden, int    *approx, int npoints){
     int fn_fp = 0;
     int tp = 0;
@@ -171,8 +187,11 @@ int main(int argc, char **argv) {
             int     *loops;
             char    *config_filename = 0;   
             int     **memberships;
-           
-            while ( (opt=getopt(argc,argv,"i:c:b:n:?"))!= EOF) {
+           float *centroid_golden;
+           float *centroid_approx;
+           int    numdims;
+            
+           while ( (opt=getopt(argc,argv,"i:c:b:n:?"))!= EOF) {
                     switch (opt) {
                 case 'i': filename=optarg;
                           break;
@@ -329,12 +348,22 @@ int main(int argc, char **argv) {
             fprintf(fileResults,"………………………………………………………………………………………………………………………………………………………………………………………………………\n");
             fprintf(fileResults,"\t\t\t\t\t\tProcess Time: %f\n", timing);
             fprintf(fileResults,"………………………………………………………………………………………………………………………………………………………………………………………………………");
-            
+           
+            if(i=0){
+                fprintf(fileResults,"\n\n………………………………………………………………………………………………………………………………………………………………………………………………………\n");
+                fprintf(fileResults,"\t\t\t\t\t\tGolden: %p\n",cluster_centres[0]);
+                fprintf(fileResults,"………………………………………………………………………………………………………………………………………………………………………………………………………\n");   
+            }
+           
             if (i > 0){
                 fprintf(fileResults,"\n\n………………………………………………………………………………………………………………………………………………………………………………………………………\n");
                 fprintf(fileResults,"\t\t\t\t\t\tFN + FP: %d\n", quality3(memberships[0], memberships[i], numObjects));
                 fprintf(fileResults,"………………………………………………………………………………………………………………………………………………………………………………………………………\n");
+            fprintf(fileResults,"\n\n………………………………………………………………………………………………………………………………………………………………………………………………………\n");
+                fprintf(fileResults,"\t\t\t\t\t\tDistance: %f\n", comparison(centroid_golden[i], centroid_approx[i], numdims));
+                fprintf(fileResults,"………………………………………………………………………………………………………………………………………………………………………………………………………\n");    
             }
+            
             
             /*
             k=0;
@@ -350,6 +379,7 @@ int main(int argc, char **argv) {
              */
         }
         fclose(fileResults);
+
 
         free(attributes);
         free(cluster_centres[0]);
