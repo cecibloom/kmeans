@@ -129,22 +129,6 @@ void usage(char *argv0) {
  * @return falses - sum of FN + FP for all k
  * 
  */
-float comparison(float *centroid_golden[],float *centroid_approx[],int  numdims){
-    int i;
-    float ave;
-    float **cluster_centres=NULL;
-    float total_distance;
-    int num_centroid;
-    
-    for (i = 0; i<numdims; i++){
-        total_distance+= euclid_dist_2(centroid_golden[i],centroid_approx[i],numdims);
-        ave=total_distance/num_centroid;
-        printf("average=%f", ave);
-        return ave;
-    }
-} 
-
-
 int quality3(int    *golden, int    *approx, int npoints){
     int fn_fp = 0;
     int tp = 0;
@@ -187,9 +171,6 @@ int main(int argc, char **argv) {
             int     *loops;
             char    *config_filename = 0;   
             int     **memberships;
-           float *centroid_golden;
-           float *centroid_approx;
-           int    numdims;
             
            while ( (opt=getopt(argc,argv,"i:c:b:n:?"))!= EOF) {
                     switch (opt) {
@@ -271,6 +252,7 @@ int main(int argc, char **argv) {
         rewind(infileconfig);
         
         printf("\nNumber of computations: %d\n",numApprox);
+        
         if (numApprox < 2) {
             printf("\nError: You need to specify one configuration set for the 'golden' and at least one for the approximation\n");
             exit(1);
@@ -291,8 +273,7 @@ int main(int argc, char **argv) {
         }
         
         fclose(infileconfig);
-        
-        
+
 	printf("I/O completed\n");	
 
 	memcpy(attributes[0], buf, numObjects*numAttributes*sizeof(float)); //copia en at[0] de buf toda la celda
@@ -304,15 +285,16 @@ int main(int argc, char **argv) {
         sprintf(buffer,"../results_%s.txt",ctime(&rawtime));
         
         fileResults = fopen(buffer, "w");
+        
         if (fileResults == NULL){
             printf("Error opening file!\n");
             exit(1);
         }
  
         fprintf(fileResults, "\n┌————————————————————————————————————————————————— GLOBAL CONFIGURATION —————————————————————————————————————————————————┐");
-        fprintf(fileResults, "\n│%35s%-35s%-1s%16d%35s"," ","Number of Observations","=", numObjects,"│");
-        fprintf(fileResults, "\n│%35s%-35s%-1s%16d%35s"," ","Number of Attributes","=", numAttributes,"│");
-        fprintf(fileResults, "\n│%35s%-35s%-1s%16d%35s"," ","Number of Threads","=", num_omp_threads,"│");
+        fprintf(fileResults, "\n│%36s%-35s%-1s%16d%35s"," ","Number of Observations","=", numObjects,"│");
+        fprintf(fileResults, "\n│%36s%-35s%-1s%16d%35s"," ","Number of Attributes","=", numAttributes,"│");
+        fprintf(fileResults, "\n│%36s%-35s%-1s%16d%35s"," ","Number of Threads","=", num_omp_threads,"│");
         fprintf(fileResults, "\n└————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————┘");
 
         int k;
@@ -334,7 +316,7 @@ int main(int argc, char **argv) {
 
             timing = omp_get_wtime();
             cluster_centres = NULL;
-            
+                        
             cluster(numObjects,
                     numAttributes,
                     attributes,                         
@@ -349,19 +331,10 @@ int main(int argc, char **argv) {
             fprintf(fileResults,"\t\t\t\t\t\tProcess Time: %f\n", timing);
             fprintf(fileResults,"………………………………………………………………………………………………………………………………………………………………………………………………………");
            
-            if(i=0){
-                fprintf(fileResults,"\n\n………………………………………………………………………………………………………………………………………………………………………………………………………\n");
-                fprintf(fileResults,"\t\t\t\t\t\tGolden: %p\n",cluster_centres[0]);
-                fprintf(fileResults,"………………………………………………………………………………………………………………………………………………………………………………………………………\n");   
-            }
-           
             if (i > 0){
                 fprintf(fileResults,"\n\n………………………………………………………………………………………………………………………………………………………………………………………………………\n");
                 fprintf(fileResults,"\t\t\t\t\t\tFN + FP: %d\n", quality3(memberships[0], memberships[i], numObjects));
                 fprintf(fileResults,"………………………………………………………………………………………………………………………………………………………………………………………………………\n");
-            fprintf(fileResults,"\n\n………………………………………………………………………………………………………………………………………………………………………………………………………\n");
-                fprintf(fileResults,"\t\t\t\t\t\tDistance: %f\n", comparison(centroid_golden[i], centroid_approx[i], numdims));
-                fprintf(fileResults,"………………………………………………………………………………………………………………………………………………………………………………………………………\n");    
             }
             
             

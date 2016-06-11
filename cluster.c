@@ -73,11 +73,6 @@
 
 #include "kmeans.h"
 
-int rozky(){
-    printf("ACA");
-    
-    return 0;
-}
 /*---< cluster() >-----------------------------------------------------------*/
 int cluster(int      numObjects,      /* number of input objects */
             int      numAttributes,   /* size of attribute of each object */
@@ -92,8 +87,6 @@ int cluster(int      numObjects,      /* number of input objects */
     //int    *membership;
     float **tmp_cluster_centres;
 
-    //membership = (int*) malloc(numObjects * sizeof(int));
-   
     srand(7);
     /* perform regular Kmeans */
     tmp_cluster_centres = kmeans_clustering(attributes,
@@ -105,13 +98,10 @@ int cluster(int      numObjects,      /* number of input objects */
                                             membership);      
 	
     if (*cluster_centres) {
-		free((*cluster_centres)[0]);
+        free((*cluster_centres)[0]);
         free(*cluster_centres);
     }
     *cluster_centres = tmp_cluster_centres;
-
-   
-    //free(membership);
 
     return 0;
 }
