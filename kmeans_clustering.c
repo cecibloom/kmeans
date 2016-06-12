@@ -125,8 +125,9 @@ int write_membership(int npoints, int *membership){
     fprintf(fileResults,"\t\t\t\t\t\tMembership\n");
     fprintf(fileResults,"…………………………………………………………………………………………………………………………………………………………………………………………………………\n");
     int i;
-    //round (npoints*0.001)
-    for (i = 0; i< round (npoints*0.001); i++){
+
+    //for (i = 0; i< round (npoints*0.001); i++){
+    for (i = 0; i < npoints; i++){
 	if (i%5 == 0) fprintf(fileResults,"\n");
         fprintf(fileResults,"[%4d] = %3d%4s",i ,membership[i]," ");
     }
@@ -150,8 +151,6 @@ float** kmeans_clustering(float **feature,    /* in: [npoints][nfeatures] */
     float  **clusters;					/* out: [nclusters][nfeatures] */
     float    delta;
         
-    double   timing;
-
     int      nthreads;
     int    **partial_new_centers_len;
     float ***partial_new_centers;
@@ -161,6 +160,7 @@ float** kmeans_clustering(float **feature,    /* in: [npoints][nfeatures] */
     /* allocate space for returning variable clusters[] */
     clusters    = (float**) malloc(nclusters *             sizeof(float*));
     clusters[0] = (float*)  malloc(nclusters * nfeatures * sizeof(float));
+    
     for (i=1; i<nclusters; i++)
         clusters[i] = clusters[i-1] + nfeatures;
 
@@ -270,7 +270,7 @@ float** kmeans_clustering(float **feature,    /* in: [npoints][nfeatures] */
     free(new_centers);
     free(new_centers_len);
     
-    write_membership(npoints, membership);
+    //write_membership(npoints, membership);
     
     return clusters;
 }

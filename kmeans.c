@@ -98,6 +98,34 @@ void usage(char *argv0) {
     exit(-1);
 }
 
+/* This function computes the quality measure based on the distance between 2 points
+ * represented by the centroid of the golden configuration and the centroid of the 
+ * approximation.
+ * @params golden, centroids of the golden
+ * @params aprrox, centroids of the approximation
+ * @params numdim, number of dimensions
+ * @params clusters, number of cluster, which indicates how may centroids are in each set
+ **/
+float quality2(float **golden, float **approx, int numdim, int gclusters, int clusters){
+    
+    int i,j;
+    float distance;
+    float partial = 0;
+    int k = gclusters;
+    
+    if (clusters < gclusters) k = clusters; //Always take the config with smaller cluster number as reference
+    
+    for (i = 0; i < k; i++){
+        distance = 0;
+        for (j = 0; j < numdim; j++){
+            distance += pow(golden[i][j] - approx[i][j], 2);
+        }
+        partial += sqrt(distance);
+    }
+    
+    return partial/clusters;
+
+}
 
 /**
  * This function computes the quality measure based on the number of False Positives 
@@ -119,8 +147,8 @@ void usage(char *argv0) {
  * FN = len(G(k)) - len(A'(k))  
  * FP = len(G(k)) - len(A'(k))  
  * 
- * So every point that it's being assigned a wrong eer has a penalty of 2: the first for
- * being a false negative, with respect to its true cluster, and the other for being a r
+ * So every point that it's being assigned a wrong cluster has a penalty of 2: the first for
+ * being a false negative, with respect to its true cluster, and the other for being a false
  * positive, with respect to the cluster to whom has been mistakenly assigned.
  * 
  * 
@@ -157,7 +185,7 @@ int main(int argc, char **argv) {
             float  *buf;
             float **attributes;
             float **cluster_centres=NULL;
-            int     i, j;
+            int     i, j, k, l;
                 
             int     numAttributes;
             int     numObjects;        
@@ -171,8 +199,9 @@ int main(int argc, char **argv) {
             int     *loops;
             char    *config_filename = 0;   
             int     **memberships;
-            
-           while ( (opt=getopt(argc,argv,"i:c:b:n:?"))!= EOF) {
+            float   **golden_centres=NULL;
+           
+            while ( (opt=getopt(argc,argv,"i:c:b:n:?"))!= EOF) {
                     switch (opt) {
                 case 'i': filename=optarg;
                           break;
@@ -202,17 +231,26 @@ int main(int argc, char **argv) {
             fprintf(stderr, "Error: no such file (%s)\n", filename);
             exit(1);
         }
-        while (fgets(line, 1024, infile) != NULL)
-            if (strtok(line, " \t\n") != 0) // Split string into tokens, the delimiters are \t and \n, if there´s at least one
-                numObjects++; //Increase in one (per line) the numObjects variable
+        while (fgets(line, 1024, infile) != NULL){
+            if (line[0] == '#') {
+                continue;
+            } else {             
+                if (strtok(line, " \t\n") != 0) // Split string into tokens, the delimiters are \t and \n, if there´s at least one
+                    numObjects++; //Increase in one (per line) the numObjects variable
+            }
+        }    
         rewind(infile); // After finishing reading the file rewind it (Set position of stream to the beginning)
         
         
         while (fgets(line, 1024, infile) != NULL) {
-            if (strtok(line, " \t\n") != 0) {
-                /* ignore the id (first attribute): numAttributes = 1; */
-                while (strtok(NULL, " ,\t\n") != NULL) numAttributes++; // Assuming all lines contain the same number of attributes
-                break;
+            if (line[0] == '#') {
+                continue;
+            } else {
+                if (strtok(line, " \t\n") != 0) {
+                    /* ignore the id (first attribute): numAttributes = 1; */
+                    while (strtok(NULL, " ,\t\n") != NULL) numAttributes++; // Assuming all lines contain the same number of attributes
+                    break;
+                }
             }
         }
         
@@ -222,18 +260,26 @@ int main(int argc, char **argv) {
         }
         
         /* allocate space for attributes[] and read attributes of all objects */
-        buf           = (float*) malloc(numObjects*numAttributes*sizeof(float)); //I get this is the # of cells
-        attributes    = (float**)malloc(numObjects*             sizeof(float*)); //Number of lines
+        buf           = (float*) malloc(numObjects*numAttributes*sizeof(float)); 
+        attributes    = (float**)malloc(numObjects*             sizeof(float*)); 
         attributes[0] = (float*) malloc(numObjects*numAttributes*sizeof(float));
+        
         for (i=1; i<numObjects; i++)
-            attributes[i] = attributes[i-1] + numAttributes; //each has the attr of a line
+            attributes[i] = attributes[i-1] + numAttributes;
+        
         rewind(infile);
+        
         i = 0;
         while (fgets(line, 1024, infile) != NULL) {
             if (strtok(line, " \t\n") == NULL) continue; 
-            for (j=0; j<numAttributes; j++) {
-                buf[i] = atof(strtok(NULL, " ,\t\n")); //a cell has the value of an attr
-                i++;
+            
+            if (line[0] == '#') {
+                continue;
+            } else {
+                for (j=0; j<numAttributes; j++) {
+                    buf[i] = atof(strtok(NULL, " ,\t\n"));
+                    i++;
+                }
             }
         }
         fclose(infile);
@@ -246,12 +292,21 @@ int main(int argc, char **argv) {
             exit(1);
         }
         
-        while (fgets(line, 1024, infileconfig) != NULL)
-            if (strtok(line, " \t\n") != 0) 
-                numApprox++;
+        while (fgets(line, 1024, infileconfig) != NULL){
+            if (line[0] == '#') {
+                continue;
+            } else {
+                if (!strcmp(line, "\n") || strcmp(line, "\r\n")){
+                    if (strtok(line, " \t\n") != 0) 
+                     numApprox++;
+                } else {
+                    continue;
+                }
+            }
+        }    
         rewind(infileconfig);
         
-        printf("\nNumber of computations: %d\n",numApprox);
+        printf("\nNumber of configurations to compute: %d\n", numApprox);
         
         if (numApprox < 2) {
             printf("\nError: You need to specify one configuration set for the 'golden' and at least one for the approximation\n");
@@ -266,26 +321,44 @@ int main(int argc, char **argv) {
         
         while (fgets(line, 1024, infileconfig) != NULL) {
             if (strtok(line, " \t\n") == NULL) continue; 
-            ks[i] = atoi(strtok(NULL, " ,\t\n")); //storing all values of K
-            thresholds[i] = atof(strtok(NULL, " ,\t\n")); //sotring all values of Threshold
-            loops[i] = atoi(strtok(NULL, " ,\t\n")); //storing all values of Loops
-            i++;
+            
+            if (line[0] == '#') {
+                continue;
+            } else if ( i < numApprox ){
+                int cl = atoi(strtok(NULL, " ,\t\n")); //storing all values of K 
+                if ( cl <= 0 || cl > numObjects ){
+                    printf("Error: Parameter 'Number of Clusters' must be between 1 and %d\n", numObjects);
+                    return 0;
+                }
+                ks[i] = cl;
+                
+                float th = atof(strtok(NULL, " ,\t\n")); //sotring all values of Threshold
+                if( th < 0 ){
+                    printf("Error: Parameter 'Threshold' must be greater or equal than 0\n");
+                    return 0;
+                }
+                thresholds[i] =  th;
+                
+                int loo = atoi(strtok(NULL, " ,\t\n")); //storing all values of Loops
+                if ( loo <= 0 ){
+                    printf("Error: Parameter 'Number of Loops' must be greater than 0\n");
+                    return 0;
+                }
+                loops[i] = loo;
+                i++;
+            }
         }
         
         fclose(infileconfig);
-
+        
 	printf("I/O completed\n");	
 
 	memcpy(attributes[0], buf, numObjects*numAttributes*sizeof(float)); //copia en at[0] de buf toda la celda
 
-        time_t rawtime;
         char buffer [255];
-
-        time (&rawtime);
-        sprintf(buffer,"../results_%s.txt",ctime(&rawtime));
+        sprintf(buffer,"../results_%lf.txt", omp_get_wtime());
         
         fileResults = fopen(buffer, "w");
-        
         if (fileResults == NULL){
             printf("Error opening file!\n");
             exit(1);
@@ -297,14 +370,12 @@ int main(int argc, char **argv) {
         fprintf(fileResults, "\n│%36s%-35s%-1s%16d%35s"," ","Number of Threads","=", num_omp_threads,"│");
         fprintf(fileResults, "\n└————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————┘");
 
-        int k;
-        
-        memberships    = (int**)malloc(numApprox*             sizeof(int*)); //Number of lines
+        memberships    = (int**)malloc(numApprox*             sizeof(int*));
         memberships[0] = (int*) malloc(numApprox*numObjects*sizeof(int));
 
         k=0;
         for (k=1; k<numApprox; k++)
-            memberships[k] = memberships[k-1] + numObjects; //each has the attr of a line
+            memberships[k] = memberships[k-1] + numObjects;
         
         for (i=0; i<numApprox; i++) {
 
@@ -316,7 +387,7 @@ int main(int argc, char **argv) {
 
             timing = omp_get_wtime();
             cluster_centres = NULL;
-                        
+            
             cluster(numObjects,
                     numAttributes,
                     attributes,                         
@@ -326,18 +397,27 @@ int main(int argc, char **argv) {
                     &cluster_centres ,
                     memberships[i]
                    );
+            
             timing = omp_get_wtime() - timing;
-            fprintf(fileResults,"………………………………………………………………………………………………………………………………………………………………………………………………………\n");
+            fprintf(fileResults,"…………………………………………………………………………………………………………………………………………………………………………………………………………\n");
             fprintf(fileResults,"\t\t\t\t\t\tProcess Time: %f\n", timing);
-            fprintf(fileResults,"………………………………………………………………………………………………………………………………………………………………………………………………………");
-           
-            if (i > 0){
-                fprintf(fileResults,"\n\n………………………………………………………………………………………………………………………………………………………………………………………………………\n");
+            fprintf(fileResults,"…………………………………………………………………………………………………………………………………………………………………………………………………………\n");
+            
+            if (i == 0){
+                //If we're running the golden, assumed always be set as the first configuration line in 
+                //the config file
+                
+                golden_centres    = (float**) malloc(ks[i] *             sizeof(float*));
+                golden_centres[0] = (float*)  malloc(ks[i] * numAttributes * sizeof(float));
+                memcpy(golden_centres, cluster_centres, ks[i] * numAttributes * sizeof(float));
+            } else {
+                fprintf(fileResults,"…………………………………………………………………………………………………………………………………………………………………………………………………………\n");
+                fprintf(fileResults,"\t\t\t\t\t\tDistance: %f\n", quality2(golden_centres, cluster_centres, numAttributes, ks[0], ks[i]));
+                fprintf(fileResults,"…………………………………………………………………………………………………………………………………………………………………………………………………………\n");
+                fprintf(fileResults,"…………………………………………………………………………………………………………………………………………………………………………………………………………\n");
                 fprintf(fileResults,"\t\t\t\t\t\tFN + FP: %d\n", quality3(memberships[0], memberships[i], numObjects));
-                fprintf(fileResults,"………………………………………………………………………………………………………………………………………………………………………………………………………\n");
+                fprintf(fileResults,"…………………………………………………………………………………………………………………………………………………………………………………………………………\n");
             }
-            
-            
             /*
             k=0;
             for (k = 0; k < ks[i]; k++){
@@ -346,13 +426,15 @@ int main(int argc, char **argv) {
                 fprintf(fileResults,"……………………………………………………………………………………………………………………………\n");
                 for (j = 0; j < numAttributes; j++) {
                     if (j%5 == 0) fprintf(fileResults,"\n");
+                    fprintf(fileResults,"\n…… OTHER ……\n");
                     fprintf(fileResults,"%15f", cluster_centres[k][j]);
+                    fprintf(fileResults,"\n…… GOLDEN ……\n");
+                    fprintf(fileResults,"%15f", golden_centres[k][j]);
                 }
             }
-             */
+            */
         }
         fclose(fileResults);
-
 
         free(attributes);
         free(cluster_centres[0]);

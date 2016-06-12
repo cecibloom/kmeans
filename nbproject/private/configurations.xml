@@ -47,18 +47,18 @@
       </nativedebugger>
       <runprofile version="9">
         <runcommandpicklist>
-          <runcommandpicklistitem>"${OUTPUT_PATH}" -i "C:\Users\cecibloom\Downloads\rodinia_3.1\rodinia_3.1\data\kmeans\204800.txt" -k 5 -t 100 -n 2 -l 400</runcommandpicklistitem>
-          <runcommandpicklistitem>"${OUTPUT_PATH}" -i "D:\Ceci\PoliMi\2. ACA\Project\Data\750000_1.txt" -k 3 -t 750 -n 2 -l 3000</runcommandpicklistitem>
-          <runcommandpicklistitem>"${OUTPUT_PATH}" -i "D:\Ceci\PoliMi\2. ACA\Project\Data\750000_1.txt" -k 3 -t 75 -n 2 -l 3000</runcommandpicklistitem>
           <runcommandpicklistitem>"${OUTPUT_PATH}" -i "D:\Ceci\PoliMi\2. ACA\Project\Data\750000_1.txt" -k 15 -t 75 -n 2 -l 3000</runcommandpicklistitem>
           <runcommandpicklistitem>"${OUTPUT_PATH}" -i "D:\Ceci\PoliMi\2. ACA\Project\Data\750000_1.txt" -c "D:\Ceci\PoliMi\2. ACA\Project\Data\config1.txt"</runcommandpicklistitem>
-          <runcommandpicklistitem>"${OUTPUT_PATH}" -i "D:\Ceci\PoliMi\2. ACA\Project\Data\750000_1.txt" -c "D:\Ceci\PoliMi\2. ACA\Project\Data\config1.txt" -n 2</runcommandpicklistitem>
           <runcommandpicklistitem>"${OUTPUT_PATH}" -i "D:\Ceci\PoliMi\2. ACA\Project\Data\25000_1.txt" -c "D:\Ceci\PoliMi\2. ACA\Project\Data\config1.txt" -n 2</runcommandpicklistitem>
-          <runcommandpicklistitem>"${OUTPUT_PATH}" -i "D:\Ceci\PoliMi\2. ACA\Project\Data\25000.txt" -c "D:\Ceci\PoliMi\2. ACA\Project\Data\config1.txt" -n 2</runcommandpicklistitem>
           <runcommandpicklistitem>"${OUTPUT_PATH}" -i "D:\Ceci\PoliMi\2. ACA\Project\Data\250000_1.txt" -c "D:\Ceci\PoliMi\2. ACA\Project\Data\config1.txt" -n 2</runcommandpicklistitem>
+          <runcommandpicklistitem>"${OUTPUT_PATH}" -i "D:\Ceci\PoliMi\2. ACA\Project\Data\25000.txt" -c "D:\Ceci\PoliMi\2. ACA\Project\Data\config1.txt" -n 2</runcommandpicklistitem>
+          <runcommandpicklistitem>"${OUTPUT_PATH}" -i "D:\Ceci\PoliMi\2. ACA\Project\Data\75000_1.txt" -c "D:\Ceci\PoliMi\2. ACA\Project\Data\config1.txt" -n 2</runcommandpicklistitem>
+          <runcommandpicklistitem>"${OUTPUT_PATH}" -i "D:\Ceci\PoliMi\2. ACA\Project\Data\750000_1.txt" -c "D:\Ceci\PoliMi\2. ACA\Project\Data\config1.txt" -n 2</runcommandpicklistitem>
           <runcommandpicklistitem>"${OUTPUT_PATH}" -i "D:\Ceci\PoliMi\2. ACA\Project\Data\20.txt" -c "D:\Ceci\PoliMi\2. ACA\Project\Data\config1.txt" -n 2</runcommandpicklistitem>
+          <runcommandpicklistitem>"${OUTPUT_PATH}" -i "D:\Ceci\PoliMi\2. ACA\Project\Data\10x5.txt" -c "D:\Ceci\PoliMi\2. ACA\Project\Data\config1.txt" -n 2</runcommandpicklistitem>
+          <runcommandpicklistitem>"${OUTPUT_PATH}" -i "D:\Ceci\PoliMi\2. ACA\Project\Data\5x10.txt" -c "D:\Ceci\PoliMi\2. ACA\Project\Data\config1.txt" -n 2</runcommandpicklistitem>
         </runcommandpicklist>
-        <runcommand>"${OUTPUT_PATH}" -i "D:\Ceci\PoliMi\2. ACA\Project\Data\20.txt" -c "D:\Ceci\PoliMi\2. ACA\Project\Data\config1.txt" -n 2</runcommand>
+        <runcommand>"${OUTPUT_PATH}" -i "D:\Ceci\PoliMi\2. ACA\Project\Data\5x10.txt" -c "D:\Ceci\PoliMi\2. ACA\Project\Data\config1.txt" -n 2</runcommand>
         <rundir>.</rundir>
         <buildfirst>false</buildfirst>
         <console-type>1</console-type>

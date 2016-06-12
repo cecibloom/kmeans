@@ -84,7 +84,6 @@ int cluster(int      numObjects,      /* number of input objects */
             int    *membership
             )
 {
-    //int    *membership;
     float **tmp_cluster_centres;
 
     srand(7);
@@ -98,7 +97,7 @@ int cluster(int      numObjects,      /* number of input objects */
                                             membership);      
 	
     if (*cluster_centres) {
-        free((*cluster_centres)[0]);
+	free((*cluster_centres)[0]);
         free(*cluster_centres);
     }
     *cluster_centres = tmp_cluster_centres;
