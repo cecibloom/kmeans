@@ -1,5 +1,24 @@
-Usage: ./kmeans [switches] -i filename
-       -i filename     :  file containing data to be clustered
-       -b                 :input file is in binary format
-       -k                 : number of clusters (default is 8) 
-       -t threshold    : threshold value
+Usage: ./kmeans [switches]
+       -i filename      :   file containing data to be clustered (PATH)
+       -c               :   configuration file (txt) (PATH)
+       -t threshold     :   threshold value (NUMBER)
+
+It is mandatory to set the configuration file as it contains all the setting that will be run and compare. 
+Follow this format:
+
+#	K	Thr	Loops
+1	28	450	130	
+2	25	400	120
+3	19	350	88
+
+Add as many setting as you want.
+
+FORMAT:
+
+First column:   Id, is not considered but we recommend to write a meaningful number. Mandatory
+Second column:  K, number of cluster to be considered for the current setting. Mandatory
+Third column:   Threshold, threshold agains wich the algorithm runs. Mandatory
+Fourth column:  Loops, number of loops the algorithm will run. Mandatory.
+
+IMPORTANT:  At least 2 settings mus be specified.
+            The first valid setting will always be considered as the GOLDEN
