@@ -1,7 +1,7 @@
 Usage: ./kmeans [switches]
        -i filename      :   file containing data to be clustered (PATH)
-       -c               :   configuration file (txt) (PATH)
-       -t threshold     :   threshold value (NUMBER)
+       -c config        :   configuration file (txt) (PATH)
+       -n threads       :   number of threads (NUMBER)
 
 It is mandatory to set the configuration file as it contains all the setting that will be run and compare. 
 Follow this format:
