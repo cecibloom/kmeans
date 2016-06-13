@@ -11,7 +11,7 @@ Follow this format:
 2	25	400	120
 3	19	350	88
 
-Add as many setting as you want.
+Add as many settings as you want.
 
 FORMAT:
 
@@ -20,5 +20,5 @@ Second column:  K, number of cluster to be considered for the current setting. M
 Third column:   Threshold, threshold agains wich the algorithm runs. Mandatory
 Fourth column:  Loops, number of loops the algorithm will run. Mandatory.
 
-IMPORTANT:  At least 2 settings mus be specified.
+IMPORTANT:  At least 2 settings must be specified.
             The first valid setting will always be considered as the GOLDEN
